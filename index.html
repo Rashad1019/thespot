@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0a0b0d">
+  <meta name="description" content="An interactive history of how the NBA point guard evolved from backcourt organizer to modern offensive engine.">
+  <title>Court Vision — The Evolution of the NBA Point Guard</title>
+  <style>
+    :root {
+      --ink: #0a0b0d;
+      --ink-2: #111319;
+      --paper: #f3eee4;
+      --paper-2: #dcd3c5;
+      --orange: #ef6b2e;
+      --orange-2: #ff9b48;
+      --blue: #66c7e8;
+      --muted: #aaa59b;
+      --line: rgba(255,255,255,.13);
+      --header: 74px;
+      --ease: cubic-bezier(.2,.75,.2,1);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--paper);
+      background:
+        radial-gradient(circle at 84% 20%, rgba(239,107,46,.09), transparent 28rem),
+        var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.65;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .16;
+      z-index: 20;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+    }
+
+    a { color: inherit; }
+    button { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    :focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: .7rem 1rem;
+      background: var(--paper);
+      color: var(--ink);
+      transform: translateY(-150%);
+      z-index: 100;
+    }
+    .skip-link:focus { transform: none; }
+
+    .site-header {
+      height: var(--header);
+      position: fixed;
+      inset: 0 0 auto 0;
+      z-index: 50;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 clamp(1rem, 4vw, 4rem);
+      background: rgba(10,11,13,.84);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+    }
+    .brand {
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: -.05em;
+      font-size: 1.3rem;
+      line-height: 1;
+      justify-self: start;
+    }
+    .brand span { color: var(--orange); }
+    .era-label {
+      color: var(--muted);
+      font-size: .74rem;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .menu-toggle {
+      justify-self: end;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--paper);
+      border-radius: 999px;
+      padding: .55rem .85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+    }
+    .menu-toggle::before {
+      content: "";
+      width: .55rem;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 0 5px rgba(239,107,46,.15);
+    }
+
+    .progress {
+      position: fixed;
+      inset: var(--header) 0 auto 0;
+      height: 3px;
+      z-index: 60;
+      background: rgba(255,255,255,.05);
+    }
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--orange), var(--orange-2));
+      transition: width .45s var(--ease);
+    }
+
+    .nav-panel {
+      position: fixed;
+      inset: var(--header) 0 0 auto;
+      width: min(470px, 100%);
+      background: #0d0f13;
+      border-left: 1px solid var(--line);
+      z-index: 45;
+      transform: translateX(102%);
+      transition: transform .45s var(--ease);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+    .nav-panel.open { transform: none; }
+    .nav-inner { padding: 2rem clamp(1.2rem, 5vw, 3rem) 4rem; }
+    .nav-kicker, .eyebrow {
+      color: var(--orange-2);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    .nav-title {
+      margin: .5rem 0 1.5rem;
+      font-size: clamp(2rem, 6vw, 3rem);
+      letter-spacing: -.055em;
+      line-height: .95;
+    }
+    .chapter-list { list-style: none; padding: 0; margin: 0; counter-reset: chapters; }
+    .chapter-list li { counter-increment: chapters; border-top: 1px solid var(--line); }
+    .chapter-list button {
+      width: 100%;
+      border: 0;
+      color: var(--paper);
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 2.2rem 1fr auto;
+      gap: .5rem;
+      align-items: center;
+      padding: .9rem 0;
+    }
+    .chapter-list button::before {
+      content: counter(chapters, decimal-leading-zero);
+      color: var(--muted);
+      font-size: .68rem;
+    }
+    .chapter-list button::after { content: "→"; color: var(--orange); opacity: 0; transform: translateX(-8px); transition: .25s; }
+    .chapter-list button:hover::after,
+    .chapter-list button[aria-current="page"]::after { opacity: 1; transform: none; }
+    .chapter-list button[aria-current="page"] { color: var(--orange-2); }
+    .nav-note { color: var(--muted); font-size: .78rem; margin-top: 1.5rem; }
+    .scrim {
+      position: fixed;
+      inset: var(--header) 0 0;
+      background: rgba(0,0,0,.55);
+      z-index: 40;
+      opacity: 0;
+      visibility: hidden;
+      transition: .35s;
+    }
+    .scrim.show { opacity: 1; visibility: visible; }
+
+    main { padding-top: var(--header); }
+    .view { display: none; min-height: calc(100vh - var(--header)); animation: reveal .6s var(--ease); }
+    .view.active { display: block; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+    .hero {
+      min-height: calc(100svh - var(--header));
+      display: grid;
+      align-items: end;
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      background-image:
+        linear-gradient(90deg, rgba(7,8,10,.98) 0%, rgba(7,8,10,.78) 42%, rgba(7,8,10,.06) 78%),
+        linear-gradient(0deg, rgba(7,8,10,.95), transparent 42%),
+        url("assets/court-hero.png");
+      background-size: cover;
+      background-position: 62% center;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: clamp(300px, 44vw, 760px);
+      aspect-ratio: 1;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50%;
+      right: -18vw;
+      bottom: -45%;
+      box-shadow: 0 0 0 11vw rgba(255,255,255,.018), 0 0 0 22vw rgba(255,255,255,.012);
+      z-index: -1;
+    }
+    .hero-content {
+      width: min(1400px, 100%);
+      margin: 0 auto;
+      padding: clamp(2rem, 6vw, 6rem) clamp(1rem, 7vw, 6.5rem) clamp(2.5rem, 7vw, 6.5rem);
+    }
+    .hero h1 {
+      max-width: 990px;
+      margin: .7rem 0 1rem;
+      font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+      font-size: clamp(4.1rem, 12vw, 11rem);
+      line-height: .76;
+      letter-spacing: -.035em;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+    .hero h1 span { display: block; color: transparent; -webkit-text-stroke: 1.5px rgba(243,238,228,.68); }
+    .hero-lede { max-width: 650px; font-size: clamp(1rem, 1.8vw, 1.25rem); color: #d5d0c7; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.8rem; }
+    .cta {
+      border: 1px solid var(--line);
+      background: rgba(10,11,13,.6);
+      color: var(--paper);
+      text-decoration: none;
+      padding: .8rem 1.1rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 750;
+    }
+    .cta.primary { background: var(--orange); border-color: var(--orange); color: #160c07; }
+    .cta:hover { transform: translateY(-2px); }
+
+    .stat-strip {
+      position: absolute;
+      right: clamp(1rem, 4vw, 4rem);
+      bottom: clamp(1.5rem, 4vw, 3.5rem);
+      display: grid;
+      grid-template-columns: repeat(3, auto);
+      gap: 2.3rem;
+    }
+    .stat strong { display: block; font-size: 1.6rem; line-height: 1; }
+    .stat span { color: var(--muted); font-size: .64rem; letter-spacing: .13em; text-transform: uppercase; }
+
+    .landing-body { background: var(--paper); color: var(--ink); }
+    .manifesto {
+      width: min(1180px, calc(100% - 2rem));
+      margin: auto;
+      padding: clamp(5rem, 10vw, 10rem) 0;
+      display: grid;
+      grid-template-columns: .75fr 1.25fr;
+      gap: clamp(2rem, 8vw, 8rem);
+      align-items: start;
+    }
+    .manifesto h2 {
+      margin: 0;
+      font-family: Georgia, serif;
+      font-size: clamp(2.7rem, 6vw, 5.8rem);
+      line-height: .95;
+      letter-spacing: -.055em;
+    }
+    .manifesto-copy p { font-family: Georgia, serif; font-size: clamp(1.15rem, 2vw, 1.55rem); margin-top: 0; }
+    .manifesto-copy p:first-child::first-letter {
+      float: left;
+      font-family: Impact, sans-serif;
+      color: var(--orange);
+      font-size: 5rem;
+      line-height: .72;
+      padding: .12em .12em 0 0;
+    }
+    .thesis {
+      border-left: 4px solid var(--orange);
+      margin-top: 2.5rem;
+      padding: .2rem 0 .2rem 1.5rem;
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .timeline-section { padding: 0 max(1rem, calc((100% - 1180px)/2)) 7rem; }
+    .timeline-head { display: flex; justify-content: space-between; gap: 1rem; align-items: end; margin-bottom: 2rem; }
+    .timeline-head h2 { font-size: clamp(2.3rem, 5vw, 4rem); margin: 0; letter-spacing: -.05em; }
+    .timeline-head p { max-width: 440px; margin: 0; color: #555; }
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(220px, 1fr));
+      gap: 1px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      background: rgba(10,11,13,.18);
+      border: 1px solid rgba(10,11,13,.18);
+    }
+    .timeline-card {
+      min-height: 310px;
+      border: 0;
+      padding: 1.3rem;
+      background: var(--paper);
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      scroll-snap-align: start;
+      position: relative;
+      transition: .3s var(--ease);
+    }
+    .timeline-card:hover { background: var(--ink); color: var(--paper); transform: translateY(-5px); }
+    .timeline-card .year { color: var(--orange); font-weight: 900; font-size: .72rem; letter-spacing: .15em; }
+    .timeline-card h3 { font-size: 1.65rem; line-height: 1; letter-spacing: -.04em; margin: 5rem 0 .8rem; }
+    .timeline-card p { font-size: .85rem; opacity: .72; }
+    .timeline-card::after { content: "↗"; position: absolute; top: 1rem; right: 1rem; font-size: 1.2rem; }
+
+    .chapter {
+      --chapter-accent: var(--orange);
+      width: min(1440px, 100%);
+      margin: auto;
+      padding: clamp(2rem, 6vw, 6rem) clamp(1rem, 6vw, 6rem) 4rem;
+      position: relative;
+    }
+    .chapter::before {
+      content: "";
+      position: fixed;
+      right: -16vw;
+      bottom: -22vw;
+      width: 44vw;
+      min-width: 420px;
+      aspect-ratio: 1;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 50%;
+      box-shadow: 0 0 0 9vw rgba(255,255,255,.012), 0 0 0 18vw rgba(255,255,255,.008);
+      pointer-events: none;
+      z-index: -1;
+    }
+    .chapter-head {
+      display: grid;
+      grid-template-columns: minmax(0, .75fr) minmax(270px, 1.25fr);
+      gap: clamp(2rem, 8vw, 8rem);
+      align-items: end;
+      padding-bottom: clamp(2.5rem, 6vw, 5rem);
+      border-bottom: 1px solid var(--line);
+    }
+    .chapter-index {
+      font-family: Impact, sans-serif;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(255,255,255,.22);
+      font-size: clamp(5rem, 15vw, 13rem);
+      line-height: .72;
+    }
+    .chapter-era { color: var(--chapter-accent); text-transform: uppercase; letter-spacing: .2em; font-weight: 800; font-size: .72rem; }
+    .chapter h1 {
+      font-family: Georgia, serif;
+      font-size: clamp(3rem, 7vw, 7rem);
+      letter-spacing: -.065em;
+      line-height: .88;
+      margin: .65rem 0 1rem;
+      text-wrap: balance;
+    }
+    .chapter-deck { max-width: 700px; color: #bdb8ae; font-size: clamp(1rem, 1.7vw, 1.25rem); }
+    .article-grid {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 740px) 1fr;
+      gap: clamp(2rem, 5vw, 5rem);
+      padding-top: clamp(3rem, 7vw, 6rem);
+    }
+    .side-fact { align-self: start; position: sticky; top: calc(var(--header) + 2rem); }
+    .side-fact strong { display: block; color: var(--chapter-accent); font-size: clamp(2.2rem, 5vw, 4rem); line-height: .95; letter-spacing: -.05em; }
+    .side-fact span { display: block; margin-top: .65rem; color: var(--muted); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; }
+    .article-copy { font-family: Georgia, "Times New Roman", serif; color: #e3ded5; font-size: clamp(1.08rem, 1.5vw, 1.28rem); }
+    .article-copy p { margin: 0 0 1.55em; }
+    .article-copy p:first-child::first-letter {
+      float: left;
+      color: var(--chapter-accent);
+      font-family: Impact, sans-serif;
+      font-size: 5.4rem;
+      line-height: .74;
+      padding: .12em .12em 0 0;
+    }
+    .article-copy h2 { font-family: Inter, sans-serif; font-size: clamp(1.8rem, 3vw, 2.8rem); line-height: 1.05; letter-spacing: -.04em; margin: 2.5em 0 .6em; color: var(--paper); }
+    .pull-quote { align-self: start; font-family: Georgia, serif; border-top: 4px solid var(--chapter-accent); padding-top: 1rem; font-size: clamp(1.3rem, 2.4vw, 2rem); line-height: 1.18; color: var(--paper); }
+    .pull-quote small { display: block; margin-top: 1rem; color: var(--muted); font-family: Inter, sans-serif; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; }
+
+    .chapter-nav {
+      margin-top: clamp(4rem, 10vw, 9rem);
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .chapter-nav button {
+      border: 0;
+      background: transparent;
+      color: var(--paper);
+      cursor: pointer;
+      padding: .8rem 0;
+      font-weight: 800;
+    }
+    .chapter-nav button:hover { color: var(--orange-2); }
+    .chapter-nav .next { margin-left: auto; text-align: right; }
+    .chapter-nav small { display: block; color: var(--muted); font-size: .64rem; letter-spacing: .12em; text-transform: uppercase; }
+
+    .sources { list-style: none; padding: 0; font-family: Inter, sans-serif; }
+    .sources li { border-top: 1px solid var(--line); padding: 1rem 0; }
+    .sources a { text-decoration-color: var(--orange); text-underline-offset: .25em; }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 2rem clamp(1rem, 4vw, 4rem);
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: .75rem;
+    }
+
+    @media (max-width: 980px) {
+      .stat-strip { display: none; }
+      .manifesto { grid-template-columns: 1fr; }
+      .article-grid { grid-template-columns: minmax(0, 1fr) 220px; }
+      .side-fact { grid-column: 1 / -1; display: flex; gap: 1rem; align-items: end; position: static; }
+    }
+    @media (max-width: 720px) {
+      :root { --header: 64px; }
+      .site-header { grid-template-columns: 1fr auto; }
+      .era-label { display: none; }
+      .hero { background-position: 66% center; min-height: calc(100svh - var(--header)); }
+      .hero h1 { font-size: clamp(3.8rem, 20vw, 7rem); }
+      .hero-lede { max-width: 92%; }
+      .manifesto { padding: 4rem 0; }
+      .timeline-head { align-items: start; flex-direction: column; }
+      .timeline { grid-template-columns: repeat(4, 82vw); }
+      .chapter-head { grid-template-columns: 1fr; gap: 2rem; }
+      .chapter-index { font-size: 6rem; }
+      .article-grid { grid-template-columns: 1fr; }
+      .pull-quote { margin-top: 1rem; }
+      .chapter-nav { align-items: stretch; }
+      footer { flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="#home" data-route="home">COURT<span>VISION</span></a>
+    <div class="era-label" id="eraLabel">An interactive basketball history</div>
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="navPanel">Chapters</button>
+  </header>
+  <div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+  <aside class="nav-panel" id="navPanel" aria-label="Chapter navigation">
+    <div class="nav-inner">
+      <div class="nav-kicker">Table of contents</div>
+      <h2 class="nav-title">Four eras.<br>One evolving role.</h2>
+      <ol class="chapter-list" id="chapterList"></ol>
+      <p class="nav-note">Tip: use the left and right arrow keys to move between chapters.</p>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <section class="view active" id="home" data-title="An interactive basketball history">
+      <div class="hero">
+        <div class="hero-content">
+          <div class="eyebrow">1946 → Today · The NBA Point Guard</div>
+          <h1>Court <span>Vision</span></h1>
+          <p class="hero-lede">How basketball’s smallest organizer became its largest idea—from backcourt safety valve to scorer, strategist, and engine of the modern offense.</p>
+          <div class="hero-actions">
+            <button class="cta primary" data-route="origins">Start the story&nbsp; →</button>
+            <button class="cta" id="openTimeline">Explore the timeline</button>
+          </div>
+        </div>
+        <div class="stat-strip" aria-label="Story overview">
+          <div class="stat"><strong>80+</strong><span>Years of change</span></div>
+          <div class="stat"><strong>14</strong><span>Chapters</span></div>
+          <div class="stat"><strong>1</strong><span>Position redefined</span></div>
+        </div>
+      </div>
+
+      <div class="landing-body">
+        <section class="manifesto">
+          <h2>The position that learned to control everything.</h2>
+          <div class="manifesto-copy">
+            <p>The history of the NBA point guard is the history of basketball’s changing definition of control. In the league’s earliest years, control meant protecting possession, calling a set, and passing to a larger scorer. Today, it can mean shooting from thirty feet, attacking a switch, directing four shooters, or bending a defense without touching the ball.</p>
+            <p>The role did not simply move from passing toward scoring. It evolved from <em>ball distribution</em> toward <em>advantage creation</em>.</p>
+            <div class="thesis">The modern “point” is whoever reads the defense, changes its shape, and makes the possession’s most important decisions—regardless of size or listed position.</div>
+          </div>
+        </section>
+
+        <section class="timeline-section" id="timeline">
+          <div class="timeline-head">
+            <h2>The fast break through history</h2>
+            <p>Four pivotal eras turned a cautious backcourt job into basketball’s most influential offensive role.</p>
+          </div>
+          <div class="timeline">
+            <button class="timeline-card" data-route="origins"><span class="year">1891–1954</span><h3>The organizer</h3><p>Positions emerge, the NBA forms, and Bob Cousy makes creativity part of the job.</p></button>
+            <button class="timeline-card" data-route="expansion"><span class="year">1954–1979</span><h3>The expansion</h3><p>The shot clock, Oscar Robertson, Walt Frazier, and Tiny Archibald expand the guard’s authority.</p></button>
+            <button class="timeline-card" data-route="systems"><span class="year">1979–2004</span><h3>The system</h3><p>Magic breaks the size rule while Stockton, Payton, and Kidd master structure.</p></button>
+            <button class="timeline-card" data-route="geometry"><span class="year">2004–TODAY</span><h3>The geometry</h3><p>Nash, Curry, Harden, and a generation of initiators stretch creation across the lineup.</p></button>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section class="view" id="origins" data-title="Origins · 1891–1954">
+      <article class="chapter" style="--chapter-accent:#f39a55">
+        <header class="chapter-head"><div class="chapter-index">01</div><div><div class="chapter-era">1891–1954 · Before the floor general</div><h1>From backcourt guard to organizer</h1><p class="chapter-deck">The point guard began as a defensive location, not an offensive identity. Rules, spacing, and the absence of a shot clock kept early guards cautious—until dribbling and imagination changed the job.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>1891</strong><span>Naismith writes basketball’s first rules</span></aside>
+          <div class="article-copy">
+            <p>James Naismith’s original rules did not define point guards, shooting guards, forwards, or centers. Those positions emerged as teams assigned players to regions of the floor. Centers worked near the basket and participated in center jumps. Forwards concentrated on attacking. Guards remained farther back so they could protect their own basket after a turnover.</p>
+            <p>The name was literal: guards guarded. Early basketball also lacked the modern continuous dribble, and play originally restarted with a center jump after every made basket. Both conditions reduced the flowing, end-to-end action that would eventually make a lead ballhandler so important.</p>
+            <h2>The running guard</h2>
+            <p>As dribbling became established and teams standardized around five players, coaches began differentiating between a more mobile “running guard” and a defensively conservative partner. The running guard advanced with the play and became an ancestor of the point guard. Even then, the job emphasized possession over invention.</p>
+            <p>The Basketball Association of America began in 1946 and became the NBA after its 1949 merger with the National Basketball League. Its earliest offenses were built around interior players such as George Mikan. With no three-point line and low shooting percentages, the safest plan was to move the ball toward the largest effective scorer. Guards transported the ball, entered it to the post, and stayed ready to stop the counterattack.</p>
+            <p>There was also no shot clock. A team dissatisfied with the available shot could simply keep possession, which reduced the need for one player to diagnose the defense within a fixed time. The point guard’s authority was growing, but urgency—the force that would make his decisions indispensable—had not yet entered every possession.</p>
+          </div>
+          <aside class="pull-quote">The position began as a place on the court. It became a way of seeing the court.<small>The first transformation</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="home"><small>Back</small>Introduction</button><button class="next" data-route="cousy"><small>Next chapter</small>Cousy’s creative break →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="cousy" data-title="Bob Cousy · 1950s">
+      <article class="chapter" style="--chapter-accent:#67c8e8">
+        <header class="chapter-head"><div class="chapter-index">02</div><div><div class="chapter-era">1950–1963 · Creativity becomes a responsibility</div><h1>Bob Cousy invents the floor general</h1><p class="chapter-deck">Behind-the-back passes and ambidextrous dribbling were not circus tricks. In Cousy’s hands, invention became a disciplined way to reach openings before the defense understood them.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>8×</strong><span>Consecutive seasons leading the NBA in assists</span></aside>
+          <div class="article-copy">
+            <p>Bob Cousy joined the Boston Celtics in 1950 and became the league’s first iconic point guard. He handled the ball with either hand, changed direction unpredictably, and delivered passes from unfamiliar angles. Coaches who associated safety with simplicity sometimes viewed those choices as reckless. Cousy proved that the unusual option could be the safest one when it arrived before a defender anticipated it.</p>
+            <p>His strongest stage was transition. A fast break appears spontaneous, but it is a dense decision problem: How many defenders are back? Which lane does each teammate occupy? Has the final defender committed to the ball? Cousy could delay a pass for one extra step, pull the defender toward him, and release the ball into the space that commitment created.</p>
+            <h2>A leader with the ball</h2>
+            <p>Cousy led the league in assists for eight consecutive seasons and organized six Boston championship teams. Bill Russell’s defense and rebounding were the dynasty’s foundation, but Cousy helped turn stops into immediate attacks. More broadly, he made “floor general” an identity. The term implied command of personnel, pace, spacing, and emotional rhythm—not merely possession of the ball.</p>
+            <p>Raw assist totals cannot fully transport his performance into the present. Scorekeepers generally required a more direct relationship between pass and basket, and the era offered fewer drive-and-kick opportunities. His larger contribution was permission. After Cousy, a guard could be inventive and responsible at the same time.</p>
+          </div>
+          <aside class="pull-quote">Creativity was not the opposite of discipline. It was a method for solving defensive problems.<small>The Cousy principle</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="origins"><small>Previous</small>Origins</button><button class="next" data-route="shot-clock"><small>Next chapter</small>Twenty-four seconds →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="shot-clock" data-title="The Shot Clock · 1954">
+      <article class="chapter">
+        <header class="chapter-head"><div class="chapter-index">03</div><div><div class="chapter-era">1954 · Time enters every possession</div><h1>Twenty-four seconds change the job</h1><p class="chapter-deck">The shot clock did more than speed up basketball. It turned the guard into the manager of a scarce resource: time.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>:24</strong><span>Seconds to produce a shot</span></aside>
+          <div class="article-copy">
+            <p>Before 1954, an NBA team could protect a lead by holding the ball. The infamous 19–18 game between Fort Wayne and Minneapolis in 1950 exposed the flaw. With no obligation to attack, stalling could replace basketball. Syracuse owner Danny Biasone helped devise a solution by dividing a game’s seconds by the combined number of attempts he believed an entertaining contest should contain. The result was close to twenty-four.</p>
+            <p>Once adopted, the clock made each possession a timed problem. Someone had to cross half court quickly enough to preserve options, recognize the coverage, start an action, and create a fallback when the first plan failed. That responsibility naturally settled on the lead guard.</p>
+            <h2>Tempo becomes strategy</h2>
+            <p>More shots meant more rebounds and transitions. A point guard could now create value by attacking before the defense was set, but speed alone was insufficient. He had to distinguish productive urgency from haste. The best guards learned when to run, when to reset, and when to reserve the final possession of a quarter.</p>
+            <p>The point guard became the bridge between a coach’s plan and the possession’s disorder. The play might begin according to instruction, but the defense could deny its first option. The clock kept moving. The guard needed to invent the next answer without surrendering control.</p>
+          </div>
+          <aside class="pull-quote">The clock did not merely accelerate the game. It made rapid judgment valuable on every trip.<small>Why 1954 matters</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="cousy"><small>Previous</small>Bob Cousy</button><button class="next" data-route="expansion"><small>Next chapter</small>The role expands →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="expansion" data-title="Expansion · 1960s–70s">
+      <article class="chapter" style="--chapter-accent:#f0b04e">
+        <header class="chapter-head"><div class="chapter-index">04</div><div><div class="chapter-era">1960–1979 · Size, scoring, and two-way command</div><h1>The role becomes an entire offense</h1><p class="chapter-deck">Oscar Robertson, Walt Frazier, and Tiny Archibald proved that the chief passer could also be the chief scorer, rebounder, defender, and late-game solution.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>30.8</strong><span>Robertson’s points per game in 1961–62</span></aside>
+          <div class="article-copy">
+            <p>Oscar Robertson entered the league in 1960 at roughly 6-foot-5 and 205 pounds, unusually large for a guard. His size allowed him to see over defenders, rebound among frontcourt players, post smaller opponents, and absorb contact. During the 1961–62 season, he averaged 30.8 points, 12.5 rebounds, and 11.4 assists—the first season-long triple-double in NBA history.</p>
+            <p>The achievement represented more than accumulation. Robertson could secure the rebound, advance the ball without an outlet, organize the attack, and create the final shot. Most importantly, he showed that scoring and passing were complementary. His own offense forced help; that help opened teammates.</p>
+            <h2>Control at both ends</h2>
+            <p>Walt Frazier added a two-way model. He pressured the ball, anticipated passing lanes, rebounded, posted smaller guards, and organized a Knicks offense built on cutting and shared decisions. His 36 points and 19 assists in Game 7 of the 1970 Finals remain a complete expression of championship point-guard play.</p>
+            <p>Nate “Tiny” Archibald pushed centralization further. In 1972–73 he became the only player to lead the NBA in scoring and assists in the same season. His pressure created a sequence of losing choices: concede the shot, surrender penetration, or send help and expose a pass. The modern high-usage creator was visible decades before the term existed.</p>
+            <h2>The three-point seed</h2>
+            <p>The ABA used a three-point line from its 1967 beginning and promoted a freer style. When four ABA clubs entered the NBA in 1976, the established league inherited both talent and experimentation. The NBA adopted the line in 1979, although teams initially attempted fewer than three long shots per game. The geometry-changing tool had arrived; coaches had not yet reorganized the sport around it.</p>
+          </div>
+          <aside class="pull-quote">A dangerous scorer does not pass less. He can create better passes because the defense must respond to him.<small>The Robertson lesson</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="shot-clock"><small>Previous</small>The shot clock</button><button class="next" data-route="magic"><small>Next chapter</small>Magic breaks the mold →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="magic" data-title="Magic & Isiah · 1980s">
+      <article class="chapter" style="--chapter-accent:#bda7ff">
+        <header class="chapter-head"><div class="chapter-index">05</div><div><div class="chapter-era">1979–1990 · Two championship models</div><h1>Magic breaks the size rule</h1><p class="chapter-deck">At 6-foot-9, Magic Johnson proved that “point guard” could describe authority rather than anatomy. Isiah Thomas answered by showing that a smaller attacking guard could still be a champion’s center of gravity.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>6′9″</strong><span>Magic’s approximate height</span></aside>
+          <div class="article-copy">
+            <p>Magic Johnson entered in 1979 with a forward’s body and an elite guard’s mind. His size changed transition at its source. Instead of waiting for a big man to rebound and deliver an outlet, Magic could take the rebound himself and begin the break before opponents sorted their assignments.</p>
+            <p>“Showtime” looked spontaneous, but its foundation was disciplined recognition. Magic knew when to throw ahead, when to hold, and when to pull the defense toward him. Height expanded his passing windows and made him a post threat against smaller guards. Larger defenders, meanwhile, struggled with his handle and pace.</p>
+            <h2>A position becomes a skill set</h2>
+            <p>His 42-point, 15-rebound performance in the deciding game of the 1980 Finals became a symbol of positional flexibility. The familiar story that he simply played center all game simplifies the assignments, but the central point stands: his skills allowed Los Angeles to reorganize around an absent Kareem Abdul-Jabbar.</p>
+            <p>Larry Bird was conducting offense from forward spots at the same time, foreshadowing the point forward. Creation was beginning to detach from the smallest player.</p>
+            <h2>Isiah’s counterargument</h2>
+            <p>Isiah Thomas showed that Magic’s success did not make the small guard obsolete. He penetrated against hand contact and crowded paint, distributed, and became Detroit’s emergency scorer when playoff structure failed. The Pistons’ 1989 and 1990 titles demonstrated another viable model: the compact, aggressive creator at the heart of a deep defensive team.</p>
+          </div>
+          <aside class="pull-quote">A player was the point guard because he controlled the attack—not because he was the shortest player.<small>Magic’s revolution</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="expansion"><small>Previous</small>The role expands</button><button class="next" data-route="systems"><small>Next chapter</small>Systems and specialists →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="systems" data-title="Systems · 1990s">
+      <article class="chapter" style="--chapter-accent:#7fd3a6">
+        <header class="chapter-head"><div class="chapter-index">06</div><div><div class="chapter-era">Late 1980s–1990s · Precision under pressure</div><h1>The pick-and-roll becomes a system</h1><p class="chapter-deck">In a slower, more physical league, John Stockton, Gary Payton, Mark Price, and Tim Hardaway developed repeatable ways to manufacture space.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>15,806</strong><span>Stockton’s career assists</span></aside>
+          <div class="article-copy">
+            <p>The 1990s rewarded control. Hand contact on the perimeter and multiple large bodies around the paint made penetration difficult. Many teams built through post scorers, leaving point guards responsible for entry angles, possession security, and reliable half-court organization.</p>
+            <p>John Stockton and Karl Malone converted the pick-and-roll into a complete system. Stockton’s craft was precision: guide the defender into the screen, read whether the big retreats or attacks, then choose among jumper, roll pass, or weak-side delivery. The same starting alignment generated a large decision tree.</p>
+            <h2>Beyond assists</h2>
+            <p>Stockton’s career records for assists and steals reflect extraordinary durability and execution. They also show why context matters. A stable two-man structure repeatedly placed him at the final pass, while a different system might distribute credit. Assist totals measure an outcome, not every action that caused it.</p>
+            <p>Gary Payton supplied a defensive and post-up counterpoint. His ball pressure delayed opposing actions, while his strength allowed him to punish smaller guards. Mark Price anticipated the modern pull-up three and the technique of splitting two pick-and-roll defenders. Tim Hardaway made the crossover a functional instrument for shifting a defender’s weight and forcing help.</p>
+            <p>The league briefly shortened the three-point line from 1994 through 1997, but spacing remained incomplete. Most teams still used two interior players. The long shot was increasingly useful, yet it had not become the foundation of roster design.</p>
+          </div>
+          <aside class="pull-quote">The “pure” point guard was never valuable merely because he passed. He was valuable when every choice he offered the defense was dangerous.<small>Reading Stockton correctly</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="magic"><small>Previous</small>Magic & Isiah</button><button class="next" data-route="combo"><small>Next chapter</small>The backcourt blurs →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="combo" data-title="Combo Guards · 1996–2004">
+      <article class="chapter" style="--chapter-accent:#f0d564">
+        <header class="chapter-head"><div class="chapter-index">07</div><div><div class="chapter-era">1996–2004 · The labels begin to fail</div><h1>Scorer or point guard? Yes.</h1><p class="chapter-deck">Allen Iverson blurred the backcourt distinction, while Jason Kidd showed how a guard could change a team through rebounding, defense, and transition before his shooting fully developed.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>48</strong><span>Iverson’s points in Game 1 of the 2001 Finals</span></aside>
+          <div class="article-copy">
+            <p>Allen Iverson had a point guard’s size and a scorer’s mandate. Philadelphia built its 2001 Finals team around a division of labor: Iverson created shots, while larger teammates defended, rebounded, and screened. Eric Snow often handled conventional organizational work. The arrangement weakened the assumption that a single guard must embody both classical order and primary scoring.</p>
+            <p>Iverson’s efficiency and high usage remain subjects of debate, but his positional influence is clear. Young guards no longer needed to treat scoring aggression as incompatible with leadership. “Combo guard” became increasingly useful because point and shooting responsibilities could coexist or be distributed across the lineup.</p>
+            <h2>Jason Kidd’s total game</h2>
+            <p>Jason Kidd offered almost the opposite package. His early shooting limitations allowed defenses to retreat, but he controlled games through transition passing, rebounding, size, anticipation, and defense. After he joined New Jersey, the Nets jumped from 26 wins to 52 and reached consecutive Finals.</p>
+            <p>Like Robertson and Magic, Kidd could rebound and begin the break without an outlet. Later, he developed into a reliable spot-up three-point shooter and contributed to Dallas’s 2011 championship in a reduced role. That adaptation became a model for aging creators: shooting, defense, and quick connective decisions can preserve value after constant ball dominance is no longer appropriate.</p>
+          </div>
+          <aside class="pull-quote">The point guard and shooting guard did not merge into one style. They merged into one larger question: who creates the advantage?<small>The combo-guard era</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="systems"><small>Previous</small>The system era</button><button class="next" data-route="rules"><small>Next chapter</small>The rules open up →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="rules" data-title="Rule Changes · 2001–2004">
+      <article class="chapter">
+        <header class="chapter-head"><div class="chapter-index">08</div><div><div class="chapter-era">2001–2004 · Freedom and complexity</div><h1>New rules reshape the perimeter</h1><p class="chapter-deck">Zone principles and defensive three seconds made team defense more sophisticated. Hand-check restrictions gave the ballhandler greater individual freedom. The point guard had to solve both changes at once.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>3 sec</strong><span>Limit for an uncommitted defender in the lane</span></aside>
+          <div class="article-copy">
+            <p>Beginning in 2001–02, the NBA removed many illegal-defense restrictions and permitted zone principles. Defenders could occupy help positions rather than choosing immediately between guarding one player and making a formal double-team. A guard who beat his first defender might now find a preloaded wall behind him.</p>
+            <p>Defensive three seconds placed a counterweight on that freedom. A defender could not remain indefinitely in the paint without actively guarding someone. Offenses that spaced the court could pull the rim protector away from his preferred location or force him to repeatedly enter and leave the lane.</p>
+            <h2>A different type of difficulty</h2>
+            <p>Restrictions on hand-checking were emphasized in 2004. Perimeter defenders could no longer steer ballhandlers as freely with hands and forearms. Guards gained room to change direction and turn the corner, but the defense behind the initial matchup became increasingly coordinated.</p>
+            <p>The task shifted from surviving direct physical obstruction toward reading layered help. The modern guard needed to identify the second and third defender, understand which shooter each was leaving, and deliver the pass before the rotation completed.</p>
+            <p>Rule changes, shooting development, and spacing were converging. Steve Nash and the Phoenix Suns would turn those ingredients into a new architecture.</p>
+          </div>
+          <aside class="pull-quote">The first defender became easier to escape. The four defenders behind him became harder to read.<small>The modern tradeoff</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="combo"><small>Previous</small>Combo guards</button><button class="next" data-route="nash"><small>Next chapter</small>Nash finds the future →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="nash" data-title="Steve Nash · 2000s">
+      <article class="chapter" style="--chapter-accent:#f7c35d">
+        <header class="chapter-head"><div class="chapter-index">09</div><div><div class="chapter-era">2004–2012 · Pace, space, and precision</div><h1>Steve Nash discovers the modern floor</h1><p class="chapter-deck">Phoenix attacked before defenses could organize, spaced shooters around a rolling big, and treated the point guard’s scoring efficiency as the key to every pass.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>2×</strong><span>Consecutive MVP awards</span></aside>
+          <div class="article-copy">
+            <p>Mike D’Antoni’s “Seven Seconds or Less” Suns did not require every shot to happen within seven seconds. They prioritized attacking while the defense was locating assignments. Instead of treating the opening of a possession as setup, Phoenix treated it as opportunity.</p>
+            <p>Steve Nash operated with shooters around him and Amar’e Stoudemire rolling into an open lane. The defense faced connected conflicts. Step toward Nash and Stoudemire was free. Tag the roll from the wing and a shooter opened. Stay attached to both and Nash could continue toward his own efficient jumper.</p>
+            <h2>Keep the problem alive</h2>
+            <p>Nash often preserved his dribble beneath the basket and emerged on the other side. Rather than letting the first stopped drive end the action, he made the defense communicate and exchange responsibilities again. One rotation might be correct; the fourth was more likely to break.</p>
+            <p>His back-to-back MVPs in 2005 and 2006 reflected collective transformation as much as individual numbers. The Suns established four modern principles: attack early, use spacing as an active weapon, make the high pick-and-roll an ecosystem rather than a single play, and judge shots by efficiency rather than conventional positional expectations.</p>
+            <p>Chris Paul refined the same environment through control. By keeping a defender on his hip and forcing the opposing center to choose between his midrange jumper and the rolling big, Paul showed that analytics did not eliminate the middle of the floor. An elite shot from that area could remain the coverage-breaking counter.</p>
+          </div>
+          <aside class="pull-quote">Phoenix did not merely play faster. It attacked the small window before a defense became itself.<small>The Nash insight</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="rules"><small>Previous</small>Rule changes</button><button class="next" data-route="athletes"><small>Next chapter</small>The athletic wave →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="athletes" data-title="Athletic Guards · 2010s">
+      <article class="chapter" style="--chapter-accent:#ff726c">
+        <header class="chapter-head"><div class="chapter-index">10</div><div><div class="chapter-era">2008–2018 · Velocity as creation</div><h1>Rose and Westbrook attack the rim</h1><p class="chapter-deck">Explosive point guards turned defensive rebounds and small seams into immediate emergencies. Their success—and their limitations—revealed the relationship between athleticism, shooting, and postseason space.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>22</strong><span>Rose’s age when he won MVP</span></aside>
+          <div class="article-copy">
+            <p>Derrick Rose used acceleration, vertical explosion, and body control to become Chicago’s primary scorer and organizer. His 2010–11 MVP season showed that an attacking point guard could carry the scoring burden of a contender without surrendering responsibility for the offense.</p>
+            <p>Russell Westbrook pushed physical creation further. By collecting defensive rebounds and attacking instantly, he revived the Robertson–Magic principle: the fastest outlet pass is sometimes no pass at all. His 2016–17 triple-double MVP season became the defining statistical expression of that style.</p>
+            <h2>The playoff squeeze</h2>
+            <p>The model contained a warning. Athletic advantages can decline with age or injury, and an inconsistent outside shot allows postseason defenses to retreat. When defenders protect the rim without fearing the pull-up, both scoring and passing windows narrow.</p>
+            <p>Rose and Westbrook influenced a generation that sought to combine their force with more reliable shooting. Ja Morant and De’Aaron Fox preserve the value of speed in today’s league, but the modern test is what comes after the first advantage: finishing efficiency, the timing of the help read, and the accuracy of the next pass.</p>
+          </div>
+          <aside class="pull-quote">Speed creates the first advantage. Decision-making determines whether that advantage survives.<small>The athletic equation</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="nash"><small>Previous</small>Nash and space</button><button class="next" data-route="geometry"><small>Next chapter</small>Curry changes geometry →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="geometry" data-title="Stephen Curry · 2010s">
+      <article class="chapter" style="--chapter-accent:#75d7ff">
+        <header class="chapter-head"><div class="chapter-index">11</div><div><div class="chapter-era">2009–Today · Range becomes gravity</div><h1>Stephen Curry changes the geometry</h1><p class="chapter-deck">Magic changed who could play point guard. Curry changed where the position could operate—and proved a player could create without possessing the ball.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>402</strong><span>Three-pointers made in 2015–16</span></aside>
+          <div class="article-copy">
+            <p>Before Stephen Curry, defenses expected meaningful attack to begin near the three-point line. A ballhandler several feet beyond it was not an immediate threat. Curry made that assumption dangerous. His range forced defenders to engage thirty feet from the basket, stretching the first line of defense and opening more room behind it.</p>
+            <p>His unanimous 2015–16 MVP season—30.1 points per game, 402 made threes, and a 73–9 team record—marked the strategic breakthrough. A pull-up three was no longer merely a late-clock escape. For the right player, it could be primary offense.</p>
+            <h2>Creation after the pass</h2>
+            <p>Curry’s deepest innovation occurs without the ball. He relocates, cuts, and screens after initiating. Defenders cannot relax when he passes because a moment of inattention may become an open three. If two defenders follow him and a teammate scores at the rim, his movement created the basket even though a conventional box score may record nothing for him.</p>
+            <p>This expanded the idea of playmaking. Passing is one method. Shooting gravity, screening, and off-ball disruption are others. Golden State could let Draymond Green and additional teammates make decisions, reducing the predictability of a one-creator offense.</p>
+            <p>Damian Lillard extended the high-screen arms race by initiating several feet above the arc. The defending center now had to choose between conceding a long three and leaving a vast area behind the coverage. Range had become both a shot and a method of moving all five defenders.</p>
+          </div>
+          <aside class="pull-quote">A point guard no longer needed the final pass to create the shot. He could create it by changing where everyone had to stand.<small>Curry’s spatial revolution</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="athletes"><small>Previous</small>The athletic wave</button><button class="next" data-route="heliocentric"><small>Next chapter</small>One star, every decision →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="heliocentric" data-title="Heliocentric Offense · Modern Era">
+      <article class="chapter" style="--chapter-accent:#ff8f5f">
+        <header class="chapter-head"><div class="chapter-index">12</div><div><div class="chapter-era">2012–Today · The offense orbits one creator</div><h1>Harden and Luka centralize the game</h1><p class="chapter-deck">The modern lead guard can own nearly every consequential decision. That concentration produces extraordinary efficiency—and a difficult set of playoff tradeoffs.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>1</strong><span>Creator at the center of nearly every action</span></aside>
+          <div class="article-copy">
+            <p>James Harden often carried a shooting-guard label, but his peak Houston role was functionally point guard. The Rockets surrounded him with shooters and a rim-running center, then concentrated decisions in his isolation and high pick-and-roll game.</p>
+            <p>Every defensive response had a prepared punishment. Single coverage invited a drive or step-back. A helping center exposed the lob. A rotating wing exposed the corner. The design represented the analytics era at its purest: prioritize layups, free throws, and threes while giving the best creator control.</p>
+            <h2>Power and cost</h2>
+            <p>Heliocentric offense creates clarity and maximizes a star’s impact, but the workload can produce fatigue and predictability. Teammates reduced to waiting may struggle when forced to create, while playoff opponents can spend an entire series studying the same decision tree.</p>
+            <p>Luka Dončić combines Harden’s possession load with the size lineage of Robertson and Magic. He uses strength, pace, post play, step-back shooting, and cross-court passing. His nominal position can change, but his function is unmistakable: he is the point because the offense travels through his decisions.</p>
+            <p>The model is the point guard’s maximum empowerment. It is also a reminder that controlling the ball and controlling the game are not automatically the same. The most resilient offenses can transfer creation when the star is trapped or tired.</p>
+          </div>
+          <aside class="pull-quote">Heliocentrism is both the point guard’s greatest authority and the risk of asking one mind to solve every possession.<small>The modern tension</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="geometry"><small>Previous</small>Curry’s geometry</button><button class="next" data-route="today"><small>Next chapter</small>The position today →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="today" data-title="The Position Today">
+      <article class="chapter" style="--chapter-accent:#7ed7b6">
+        <header class="chapter-head"><div class="chapter-index">13</div><div><div class="chapter-era">The mid-2020s · A role distributed across the lineup</div><h1>The point is now a function</h1><p class="chapter-deck">Movement shooters, rim attackers, midrange craftsmen, jumbo initiators, and passing centers now perform different parts of the same historical job.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>5</strong><span>Players who may initiate in a modern lineup</span></aside>
+          <div class="article-copy">
+            <p>The current NBA contains several overlapping point-guard archetypes. Curry remains the movement-shooting model. Trae Young and Tyrese Haliburton use range and tempo to create passes. Ja Morant and De’Aaron Fox collapse defenses through speed. Shai Gilgeous-Alexander and Jalen Brunson create through strength, deceleration, footwork, and efficient scoring inside the arc.</p>
+            <p>Large initiators such as Dončić, Cade Cunningham, and LaMelo Ball combine guard skill with passing angles created by size. LeBron James can direct an offense while officially listed at forward. Nikola Jokić performs point-guard functions from center, initiating at the elbow, post, top, or in transition.</p>
+            <h2>Nominal, defensive, functional</h2>
+            <p>A player may have three different positions. His nominal position appears on the lineup card. His defensive position describes whom he guards. His functional offensive position describes what decisions he controls. Those categories often identify different roles.</p>
+            <p>This distribution can make an offense more resilient. One player brings the ball up, another initiates the main action, and a third makes the final pass after rotation. If the first creator is trapped, the possession continues through someone else.</p>
+            <h2>The defensive bill</h2>
+            <p>Modern offense also hunts weak defenders through repeated screens. Small guards must navigate actions, rotate to shooters, tag rolling centers, and survive switches onto larger opponents. Offensive production cannot be evaluated without considering how much defensive protection the lineup must provide.</p>
+            <p>The future will likely bring more large creators and more shared initiation. Smaller point guards will remain viable when extraordinary shooting, speed, or judgment offsets defensive limitations. The five traditional labels will persist, but offensive authority will continue to ignore them.</p>
+          </div>
+          <aside class="pull-quote">The modern lineup does not ask only, “Who is our point guard?” It asks, “Where does creation come from, and who can keep it alive?”<small>The position today</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="heliocentric"><small>Previous</small>Heliocentric offense</button><button class="next" data-route="legacy"><small>Final chapter</small>What never changed →</button></nav>
+      </article>
+    </section>
+
+    <section class="view" id="legacy" data-title="Legacy & Sources">
+      <article class="chapter" style="--chapter-accent:#ef6b2e">
+        <header class="chapter-head"><div class="chapter-index">14</div><div><div class="chapter-era">Conclusion · The enduring responsibility</div><h1>What never changed</h1><p class="chapter-deck">The tools evolved. The central task did not: understand the game before the defense can reorganize, then turn that understanding into the best available shot.</p></div></header>
+        <div class="article-grid">
+          <aside class="side-fact"><strong>∞</strong><span>Ways to create one advantage</span></aside>
+          <div class="article-copy">
+            <p>The point guard began as a backcourt protector and became basketball’s primary interpreter. Cousy used transition imagination. Robertson used size and scoring. Frazier controlled both ends. Magic expanded the usable court through pace and vision. Stockton mastered repeatable reads. Nash attacked defensive organization itself. Paul optimized control. Curry changed where defenders had to stand. Harden and Dončić concentrated the entire decision tree in one player.</p>
+            <p>The techniques evolved because the rules, spacing, and defenses evolved. The intellectual responsibility remained stable. Read the coverage. Identify the advantage. Decide whether to accelerate or preserve it. Understand the clock, score, matchup, and condition of the other nine players.</p>
+            <h2>From distributor to advantage creator</h2>
+            <p>The traditional point guard has not disappeared. His responsibilities have spread across the lineup. The “point” may create through a pass, drive, screen, post-up, thirty-foot shot, or movement away from the ball. He may record the assist or merely force the rotation that makes the assist possible.</p>
+            <p>The great point guard of the future may not resemble any earlier archetype. He will still face the same challenge: see the possession before everyone else does, and convert that vision into the best decision available.</p>
+            <h2>Selected research sources</h2>
+            <ul class="sources">
+              <li><a href="https://www.nba.com/news/history-nba-rules-changes" target="_blank" rel="noreferrer">NBA — History of NBA rules changes</a></li>
+              <li><a href="https://www.hoophall.com/hall-of-famers/bob-cousy/" target="_blank" rel="noreferrer">Naismith Memorial Basketball Hall of Fame — Bob Cousy</a></li>
+              <li><a href="https://www.hoophall.com/hall-of-famers/oscar-robertson/" target="_blank" rel="noreferrer">Naismith Memorial Basketball Hall of Fame — Oscar Robertson</a></li>
+              <li><a href="https://www.hoophall.com/hall-of-famers/magic-johnson/" target="_blank" rel="noreferrer">Naismith Memorial Basketball Hall of Fame — Magic Johnson</a></li>
+              <li><a href="https://www.basketball-reference.com/leagues/NBA_stats_per_game.html" target="_blank" rel="noreferrer">Basketball-Reference — NBA league averages by season</a></li>
+              <li><a href="https://www.basketball-reference.com/players/s/stockjo01.html" target="_blank" rel="noreferrer">Basketball-Reference — John Stockton career statistics</a></li>
+              <li><a href="https://www.basketball-reference.com/players/c/curryst01.html" target="_blank" rel="noreferrer">Basketball-Reference — Stephen Curry career statistics</a></li>
+            </ul>
+          </div>
+          <aside class="pull-quote">Control is no longer a location or a body type. It is the authority to make the possession’s most important decision.<small>The complete evolution</small></aside>
+        </div>
+        <nav class="chapter-nav"><button data-route="today"><small>Previous</small>The position today</button><button class="next" data-route="home"><small>Return</small>Back to the opening →</button></nav>
+      </article>
+    </section>
+  </main>
+
+  <footer><span>COURT VISION · An independent basketball history experience</span><span>Original editorial artwork · Responsive by design</span></footer>
+
+  <script>
+    const routes = [
+      ['home','Opening tip'], ['origins','Origins'], ['cousy','Bob Cousy'], ['shot-clock','The shot clock'],
+      ['expansion','Robertson to Archibald'], ['magic','Magic & Isiah'], ['systems','The system era'],
+      ['combo','Combo guards'], ['rules','Rule changes'], ['nash','Steve Nash'], ['athletes','Athletic guards'],
+      ['geometry','Stephen Curry'], ['heliocentric','Heliocentric offense'], ['today','The position today'], ['legacy','Legacy & sources']
+    ];
+    const views = [...document.querySelectorAll('.view')];
+    const list = document.getElementById('chapterList');
+    const panel = document.getElementById('navPanel');
+    const toggle = document.getElementById('menuToggle');
+    const scrim = document.getElementById('scrim');
+    const eraLabel = document.getElementById('eraLabel');
+    const progressBar = document.getElementById('progressBar');
+
+    routes.forEach(([id, label], index) => {
+      const li = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.route = id;
+      button.textContent = label;
+      button.setAttribute('aria-label', `Chapter ${index + 1}: ${label}`);
+      li.appendChild(button);
+      list.appendChild(li);
+    });
+
+    function setMenu(open) {
+      panel.classList.toggle('open', open);
+      scrim.classList.toggle('show', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      document.body.style.overflow = open ? 'hidden' : '';
+      if (open) panel.querySelector('button')?.focus();
+    }
+
+    function showRoute(id, updateHash = true) {
+      if (!document.getElementById(id)) id = 'home';
+      views.forEach(view => view.classList.toggle('active', view.id === id));
+      const active = document.getElementById(id);
+      document.querySelectorAll('[data-route]').forEach(el => {
+        if (el.closest('.chapter-list')) el.setAttribute('aria-current', el.dataset.route === id ? 'page' : 'false');
+      });
+      const index = routes.findIndex(([route]) => route === id);
+      progressBar.style.width = `${Math.max(0, index) / (routes.length - 1) * 100}%`;
+      eraLabel.textContent = active.dataset.title || 'An interactive basketball history';
+      document.title = `${active.dataset.title || 'Court Vision'} — Court Vision`;
+      if (updateHash && location.hash !== `#${id}`) history.pushState(null, '', `#${id}`);
+      setMenu(false);
+      window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }
+
+    document.addEventListener('click', event => {
+      const route = event.target.closest('[data-route]');
+      if (route) { event.preventDefault(); showRoute(route.dataset.route); }
+    });
+    toggle.addEventListener('click', () => setMenu(!panel.classList.contains('open')));
+    scrim.addEventListener('click', () => setMenu(false));
+    document.getElementById('openTimeline').addEventListener('click', () => document.getElementById('timeline').scrollIntoView({ behavior: 'smooth' }));
+    window.addEventListener('popstate', () => showRoute(location.hash.slice(1) || 'home', false));
+    window.addEventListener('keydown', event => {
+      if (event.key === 'Escape') return setMenu(false);
+      if (panel.classList.contains('open') || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
+      const current = routes.findIndex(([id]) => document.getElementById(id).classList.contains('active'));
+      if (event.key === 'ArrowRight' && current < routes.length - 1) showRoute(routes[current + 1][0]);
+      if (event.key === 'ArrowLeft' && current > 0) showRoute(routes[current - 1][0]);
+    });
+
+    showRoute(location.hash.slice(1) || 'home', false);
+  </script>
+</body>
+</html>
