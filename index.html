@@ -399,6 +399,39 @@
     .article-copy a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: .22em; overflow-wrap: anywhere; }
     .article-copy strong { color: var(--paper); }
     .article-copy blockquote { margin: 2rem 0; padding: 1rem 1.3rem; border-left: 3px solid var(--chapter-accent); background: rgba(255,255,255,.035); }
+    .citation-ref { margin-left: .12em; font-family: Inter, sans-serif; font-size: .62em; font-weight: 850; line-height: 0; vertical-align: super; }
+    .citation-ref a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.45em;
+      min-height: 1.45em;
+      padding: .08em .28em;
+      border-radius: 999px;
+      color: var(--orange-2);
+      background: rgba(239,107,46,.12);
+      text-decoration: none;
+    }
+    .citation-ref a:hover,
+    .citation-ref a:focus-visible { color: var(--ink); background: var(--orange-2); }
+    .source-entry { scroll-margin-top: calc(var(--header) + 1.5rem); }
+    .source-entry:target { background: rgba(239,107,46,.08); }
+    .source-returns { display: inline-flex; flex-wrap: wrap; gap: .35rem; margin-left: .55rem; }
+    .source-return {
+      display: inline-flex;
+      align-items: center;
+      min-width: 2rem;
+      min-height: 2rem;
+      justify-content: center;
+      border: 1px solid rgba(239,107,46,.38);
+      border-radius: 999px;
+      color: var(--orange-2) !important;
+      font-size: .7rem;
+      font-weight: 800;
+      text-decoration: none;
+    }
+    .source-return:hover,
+    .source-return:focus-visible { background: var(--orange); color: var(--ink) !important; }
     .load-error { max-width: 720px; margin: 3rem auto; padding: 1.5rem; border: 1px solid var(--line); color: var(--paper); }
     .pull-quote { align-self: start; font-family: Georgia, serif; border-top: 4px solid var(--chapter-accent); padding-top: 1rem; font-size: clamp(1.3rem, 2.4vw, 2rem); line-height: 1.18; color: var(--paper); }
     .pull-quote small { display: block; margin-top: 1rem; color: var(--muted); font-family: Inter, sans-serif; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; }
@@ -828,6 +861,7 @@
     const progressBar = document.getElementById('progressBar');
     let routes = [];
     let views = [];
+    const citationRegistry = new Map();
 
     const chapterMeta = [
       ['THE THESIS', 'MYTH', 'The label never accurately described the players used to define it.'],
@@ -864,27 +898,47 @@
 
     function plainText(value) {
       return removeDashes(value)
+        .replace(/(\d+\.\d{2})([1-6]\d|[1-9])(?=([.,;:!?]|$))/g, '$1')
+        .replace(/([A-Za-zÀ-ž’'”")%])([1-9]|[1-5]\d|6[0-5])(?=([.,;:!?]|$))/g, '$1')
         .replace(/\*\*/g, '')
         .replace(/\*/g, '')
         .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
         .trim();
     }
 
-    function inlineMarkdown(value) {
+    function inlineMarkdown(value, options = {}) {
+      const { citations = true, chapterId = '' } = options;
       const links = [];
+      const citationTokens = [];
       let text = value.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, (_, label, url) => {
         const token = `@@LINK${links.length}@@`;
         links.push(`<a href="${escapeHtml(url.replace(/\\/g, ''))}" target="_blank" rel="noreferrer">${escapeHtml(removeDashes(label))}</a>`);
         return token;
       });
+      const addCitation = (prefix, number) => {
+        const sourceNumber = Number(number);
+        const occurrences = citationRegistry.get(sourceNumber) || [];
+        const citationId = `citation-${sourceNumber}-${occurrences.length + 1}`;
+        occurrences.push({ id: citationId, route: chapterId });
+        citationRegistry.set(sourceNumber, occurrences);
+        const token = `@@CITE${citationTokens.length}@@`;
+        citationTokens.push(`${prefix}<sup class="citation-ref" id="${citationId}"><a href="#source-${sourceNumber}" data-source-number="${sourceNumber}" aria-label="Open source ${sourceNumber}">${sourceNumber}</a></sup>`);
+        return token;
+      };
+      if (citations) {
+        text = text.replace(/(\d+\.\d{2})([1-6]\d|[1-9])(?=([.,;:!?]|$))/g, (_, prefix, number) => addCitation(prefix, number));
+        text = text.replace(/([A-Za-zÀ-ž’'”")%])([1-9]|[1-5]\d|6[0-5])(?=([.,;:!?]|$))/g, (_, prefix, number) => addCitation(prefix, number));
+      }
       text = escapeHtml(removeDashes(text));
       text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
       text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
       links.forEach((link, index) => { text = text.replace(`@@LINK${index}@@`, link); });
+      citationTokens.forEach((citation, index) => { text = text.replace(`@@CITE${index}@@`, citation); });
       return text;
     }
 
-    function renderBlocks(body) {
+    function renderBlocks(body, options = {}) {
+      const { chapterId = '', isSources = false } = options;
       const lines = body.replace(/\r/g, '').split('\n');
       const html = [];
       let paragraph = [];
@@ -892,12 +946,20 @@
 
       const flushParagraph = () => {
         if (!paragraph.length) return;
-        html.push(`<p>${inlineMarkdown(paragraph.join(' '))}</p>`);
+        html.push(`<p>${inlineMarkdown(paragraph.join(' '), { chapterId })}</p>`);
         paragraph = [];
       };
       const flushList = () => {
         if (!ordered.length) return;
-        html.push(`<ol>${ordered.map(item => `<li>${inlineMarkdown(item)}</li>`).join('')}</ol>`);
+        html.push(`<ol>${ordered.map((item, index) => {
+          if (!isSources) return `<li>${inlineMarkdown(item, { chapterId })}</li>`;
+          const sourceNumber = index + 1;
+          const returns = citationRegistry.get(sourceNumber) || [];
+          const returnLinks = returns.length
+            ? `<span class="source-returns" aria-label="Return to citations">${returns.map((citation, returnIndex) => `<a class="source-return" href="#${citation.id}" data-return-citation="${citation.id}" data-return-route="${citation.route}" aria-label="Return to citation ${returnIndex + 1} for source ${sourceNumber}">↩${returnIndex + 1}</a>`).join('')}</span>`
+            : '';
+          return `<li class="source-entry" id="source-${sourceNumber}">${inlineMarkdown(item, { citations: false })}${returnLinks}</li>`;
+        }).join('')}</ol>`);
         ordered = [];
       };
 
@@ -910,12 +972,12 @@
         flushList();
         if (/^#{3,4}\s+/.test(line)) {
           flushParagraph();
-          html.push(`<h3>${inlineMarkdown(line.replace(/^#{3,4}\s+/, ''))}</h3>`);
+          html.push(`<h3>${inlineMarkdown(line.replace(/^#{3,4}\s+/, ''), { chapterId })}</h3>`);
           return;
         }
         if (line.startsWith('> ')) {
           flushParagraph();
-          html.push(`<blockquote>${inlineMarkdown(line.slice(2))}</blockquote>`);
+          html.push(`<blockquote>${inlineMarkdown(line.slice(2), { chapterId })}</blockquote>`);
           return;
         }
         paragraph.push(line.replace(/\s{2}$/, ''));
@@ -968,7 +1030,7 @@
           </header>
           <div class="article-grid">
             <aside class="side-fact"><strong>${escapeHtml(meta[1])}</strong><span>Key marker in the argument</span></aside>
-            <div class="article-copy">${renderBlocks(section.body)}</div>
+            <div class="article-copy">${renderBlocks(section.body, { chapterId: id, isSources: index === total - 1 })}</div>
             <aside class="pull-quote">${escapeHtml(meta[2])}<small>Chapter ${String(index + 1).padStart(2, '0')}</small></aside>
           </div>
           <nav class="chapter-nav">
@@ -1050,6 +1112,21 @@
     }
 
     document.addEventListener('click', event => {
+      const sourceReference = event.target.closest('[data-source-number]');
+      if (sourceReference && routes.length) {
+        event.preventDefault();
+        const sourceNumber = sourceReference.dataset.sourceNumber;
+        showRoute(routes[routes.length - 1][0]);
+        requestAnimationFrame(() => document.getElementById(`source-${sourceNumber}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+        return;
+      }
+      const returnReference = event.target.closest('[data-return-citation]');
+      if (returnReference && routes.length) {
+        event.preventDefault();
+        showRoute(returnReference.dataset.returnRoute);
+        requestAnimationFrame(() => document.getElementById(returnReference.dataset.returnCitation)?.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+        return;
+      }
       const route = event.target.closest('[data-route]');
       if (route && routes.length) { event.preventDefault(); showRoute(route.dataset.route); }
     });
