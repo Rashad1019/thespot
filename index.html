@@ -453,9 +453,20 @@
       .manifesto { padding: 4rem 0; }
       .timeline-head { align-items: start; flex-direction: column; }
       .timeline { grid-template-columns: repeat(4, 82vw); }
-      .chapter-head { grid-template-columns: 1fr; gap: 2rem; }
-      .chapter-index { font-size: 6rem; }
+      .chapter { padding-left: 1.4rem; padding-right: 1.4rem; }
+      .chapter-head { grid-template-columns: 1fr; gap: 1.35rem; padding-bottom: 2.2rem; }
+      .chapter-index { font-size: 5rem; }
+      .chapter h1 {
+        font-size: clamp(2rem, 9vw, 3rem);
+        line-height: .98;
+        letter-spacing: -.035em;
+        overflow-wrap: normal;
+        word-break: normal;
+      }
+      .chapter-deck { font-size: .98rem; line-height: 1.55; }
       .article-grid { grid-template-columns: 1fr; }
+      .side-fact { display: block; }
+      .side-fact span { margin-top: .45rem; }
       .pull-quote { margin-top: 1rem; }
       .chapter-nav { align-items: stretch; }
       footer { flex-direction: column; }
