@@ -22,7 +22,7 @@
     }
 
     * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
     body {
       margin: 0;
       color: var(--paper);
@@ -393,6 +393,13 @@
       padding: .12em .12em 0 0;
     }
     .article-copy h2 { font-family: Inter, sans-serif; font-size: clamp(1.8rem, 3vw, 2.8rem); line-height: 1.05; letter-spacing: -.04em; margin: 2.5em 0 .6em; color: var(--paper); }
+    .article-copy h3 { font-family: Inter, sans-serif; font-size: 1.25rem; margin: 2.5em 0 .7em; color: var(--orange-2); text-transform: uppercase; letter-spacing: .08em; }
+    .article-copy ol { margin: 1.8rem 0; padding-left: 1.35rem; font-family: Inter, sans-serif; font-size: .95rem; }
+    .article-copy li { margin: 0 0 1rem; padding-left: .5rem; }
+    .article-copy a { color: var(--blue); text-decoration-thickness: 1px; text-underline-offset: .22em; overflow-wrap: anywhere; }
+    .article-copy strong { color: var(--paper); }
+    .article-copy blockquote { margin: 2rem 0; padding: 1rem 1.3rem; border-left: 3px solid var(--chapter-accent); background: rgba(255,255,255,.035); }
+    .load-error { max-width: 720px; margin: 3rem auto; padding: 1.5rem; border: 1px solid var(--line); color: var(--paper); }
     .pull-quote { align-self: start; font-family: Georgia, serif; border-top: 4px solid var(--chapter-accent); padding-top: 1rem; font-size: clamp(1.3rem, 2.4vw, 2rem); line-height: 1.18; color: var(--paper); }
     .pull-quote small { display: block; margin-top: 1rem; color: var(--muted); font-family: Inter, sans-serif; font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; }
 
@@ -470,7 +477,7 @@
   <aside class="nav-panel" id="navPanel" aria-label="Chapter navigation">
     <div class="nav-inner">
       <div class="nav-kicker">Table of contents</div>
-      <h2 class="nav-title">Four eras.<br>One evolving role.</h2>
+      <h2 class="nav-title">Four movements.<br>One myth dismantled.</h2>
       <ol class="chapter-list" id="chapterList"></ol>
       <p class="nav-note">Tip: use the left and right arrow keys to move between chapters.</p>
     </div>
@@ -478,44 +485,44 @@
   <div class="scrim" id="scrim"></div>
 
   <main id="main">
-    <section class="view active" id="home" data-title="An interactive basketball history">
+    <section class="view active" id="home" data-title="The Myth of the Pure Point Guard">
       <div class="hero">
         <div class="hero-content">
-          <div class="eyebrow">1946 → Today · The NBA Point Guard</div>
-          <h1>Court <span>Vision</span></h1>
-          <p class="hero-lede">How basketball’s smallest organizer became its largest idea, from backcourt safety valve to scorer, strategist, and engine of the modern offense.</p>
+          <div class="eyebrow">An analytical and historical deconstruction</div>
+          <h1>Pure <span>Point Guard?</span></h1>
+          <p class="hero-lede">The position’s most familiar prototype was never a stable truth. It was a story basketball told itself while its greatest guards kept breaking the mold.</p>
           <div class="hero-actions">
-            <button class="cta primary" data-route="origins">Start the story&nbsp; →</button>
+            <button class="cta primary" id="startStory">Start the argument&nbsp; →</button>
             <button class="cta" id="openTimeline">Explore the timeline</button>
           </div>
         </div>
         <div class="stat-strip" aria-label="Story overview">
           <div class="stat"><strong>80+</strong><span>Years of change</span></div>
-          <div class="stat"><strong>14</strong><span>Chapters</span></div>
+          <div class="stat"><strong>14</strong><span>Analytical chapters</span></div>
           <div class="stat"><strong>1</strong><span>Position redefined</span></div>
         </div>
       </div>
 
       <div class="landing-body">
         <section class="manifesto">
-          <h2>The position that learned to control everything.</h2>
+          <h2>The prototype was always a myth.</h2>
           <div class="manifesto-copy">
-            <p>The history of the NBA point guard is the history of basketball’s changing definition of control. In the league’s earliest years, control meant protecting possession, calling a set, and passing to a larger scorer. Today, it can mean shooting from thirty feet, attacking a switch, directing four shooters, or bending a defense without touching the ball.</p>
+            <p>Basketball orthodoxy romanticized the pure point guard as a selfless distributor who protected possession, initiated the offense, and deferred scoring to larger teammates. A rigorous look at the players who shaped the position reveals that this supposedly timeless mold never accurately described them.</p>
             <p>The role did not simply move from passing toward scoring. It evolved from <em>ball distribution</em> toward <em>advantage creation</em>.</p>
-            <div class="thesis">The modern “point” is whoever reads the defense, changes its shape, and makes the possession’s most important decisions, regardless of size or listed position.</div>
+            <div class="thesis">A playmaker is only as dangerous as the scoring threat he credibly poses. The modern point is whoever can bend the defense and solve its geometry.</div>
           </div>
         </section>
 
         <section class="timeline-section" id="timeline">
           <div class="timeline-head">
-            <h2>The fast break through history</h2>
-            <p>Four pivotal eras turned a cautious backcourt job into basketball’s most influential offensive role.</p>
+            <h2>The argument in four movements</h2>
+            <p>Open any movement to enter the revised article at a pivotal shift in the position’s meaning.</p>
           </div>
           <div class="timeline">
-            <button class="timeline-card" data-route="origins"><span class="year">1891 to 1954</span><h3>The organizer</h3><p>Positions emerge, the NBA forms, and Bob Cousy makes creativity part of the job.</p></button>
-            <button class="timeline-card" data-route="expansion"><span class="year">1954 to 1979</span><h3>The expansion</h3><p>The shot clock, Oscar Robertson, Walt Frazier, and Tiny Archibald expand the guard’s authority.</p></button>
-            <button class="timeline-card" data-route="systems"><span class="year">1979 to 2004</span><h3>The system</h3><p>Magic breaks the size rule while Stockton, Payton, and Kidd master structure.</p></button>
-            <button class="timeline-card" data-route="geometry"><span class="year">2004 to today</span><h3>The geometry</h3><p>Nash, Curry, Harden, and a generation of initiators stretch creation across the lineup.</p></button>
+            <button class="timeline-card" data-chapter="1"><span class="year">THE FALLACY</span><h3>Deconstruct the prototype</h3><p>Why the pass first archetype is a retrospective fiction rather than a durable basketball truth.</p></button>
+            <button class="timeline-card" data-chapter="5"><span class="year">THE SIZE PARADIGM</span><h3>Break the physical mold</h3><p>Robertson, Magic, the ABA, and the scouting assumptions challenged by unconventional creators.</p></button>
+            <button class="timeline-card" data-chapter="7"><span class="year">THE RULES</span><h3>Legalize the advantage</h3><p>Zone principles, defensive three seconds, and perimeter freedom reconstruct the offensive floor.</p></button>
+            <button class="timeline-card" data-chapter="9"><span class="year">THE GEOMETRY</span><h3>Redefine creation</h3><p>Nash, Curry, heliocentrism, gravity, and the final separation of role from position.</p></button>
           </div>
         </section>
       </div>
@@ -800,30 +807,165 @@
   <footer><span>COURT VISION · An independent basketball history experience</span><span>Original editorial artwork · Responsive by design</span></footer>
 
   <script>
-    const routes = [
-      ['home','Opening tip'], ['origins','Origins'], ['cousy','Bob Cousy'], ['shot-clock','The shot clock'],
-      ['expansion','Robertson to Archibald'], ['magic','Magic & Isiah'], ['systems','The system era'],
-      ['combo','Combo guards'], ['rules','Rule changes'], ['nash','Steve Nash'], ['athletes','Athletic guards'],
-      ['geometry','Stephen Curry'], ['heliocentric','Heliocentric offense'], ['today','The position today'], ['legacy','Legacy & sources']
-    ];
-    const views = [...document.querySelectorAll('.view')];
+    const ARTICLE_PATH = 'NBA_Point_Guard_Evolution_Analysis_revised.md';
     const list = document.getElementById('chapterList');
     const panel = document.getElementById('navPanel');
     const toggle = document.getElementById('menuToggle');
     const scrim = document.getElementById('scrim');
     const eraLabel = document.getElementById('eraLabel');
     const progressBar = document.getElementById('progressBar');
+    let routes = [];
+    let views = [];
 
-    routes.forEach(([id, label], index) => {
-      const li = document.createElement('li');
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.dataset.route = id;
-      button.textContent = label;
-      button.setAttribute('aria-label', `Chapter ${index + 1}: ${label}`);
-      li.appendChild(button);
-      list.appendChild(li);
-    });
+    const chapterMeta = [
+      ['THE THESIS', 'MYTH', 'The label never accurately described the players used to define it.'],
+      ['1891 AND AFTER', '1891', 'The position began as a defensive region before it became an offensive authority.'],
+      ['1946 TO 1950', '1946', 'The NBA inherited an interior game and a cautious backcourt.'],
+      ['1950 TO 1960', '24 SEC', 'Time pressure turned creative judgment into a possession by possession necessity.'],
+      ['1960 TO 1979', '30.8', 'Robertson proved scoring pressure and elite passing were the same offensive system.'],
+      ['1976 TO 1990', '6 FT 9', 'Magic made point guard a description of function rather than anatomy.'],
+      ['THE HALF COURT ERA', '15,806', 'Efficiency without enough scoring volume can still leave value on the table.'],
+      ['2001 TO 2004', '3 RULES', 'The league gave guards freedom at the point of attack and complexity behind it.'],
+      ['2004 AND AFTER', '50 40 90', 'Phoenix attacked the moment before a defense could become fully organized.'],
+      ['THE GRAVITY ERA', '402', 'Curry made location and movement forms of playmaking.'],
+      ['THE USAGE APEX', '41.7%', 'Heliocentrism places nearly every important decision in one creator’s hands.'],
+      ['POSITIONLESS BASKETBALL', '3 ROLES', 'Ball handler, wing, and big describe modern function better than one through five.'],
+      ['THE CONCLUSION', '1 IDEA', 'Advantage creation is the position’s enduring competitive purpose.'],
+      ['RESEARCH NOTES', '65', 'The revised analysis is supported by a complete linked bibliography.']
+    ];
+
+    const escapeHtml = value => value.replace(/[&<>"']/g, char => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[char]);
+
+    function removeDashes(value) {
+      return value
+        .replace(/\\([._!#-])/g, '$1')
+        .replace(/\u2014/g, ', ')
+        .replace(/\u2013/g, ' to ')
+        .replace(/\u2011/g, ' ')
+        .replace(/([A-Za-z])\-([A-Za-z])/g, '$1 $2')
+        .replace(/\s+-\s+/g, ': ')
+        .replace(/-/g, ' ')
+        .replace(/\s{2,}/g, ' ');
+    }
+
+    function plainText(value) {
+      return removeDashes(value)
+        .replace(/\*\*/g, '')
+        .replace(/\*/g, '')
+        .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+        .trim();
+    }
+
+    function inlineMarkdown(value) {
+      const links = [];
+      let text = value.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, (_, label, url) => {
+        const token = `@@LINK${links.length}@@`;
+        links.push(`<a href="${escapeHtml(url.replace(/\\/g, ''))}" target="_blank" rel="noreferrer">${escapeHtml(removeDashes(label))}</a>`);
+        return token;
+      });
+      text = escapeHtml(removeDashes(text));
+      text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      links.forEach((link, index) => { text = text.replace(`@@LINK${index}@@`, link); });
+      return text;
+    }
+
+    function renderBlocks(body) {
+      const lines = body.replace(/\r/g, '').split('\n');
+      const html = [];
+      let paragraph = [];
+      let ordered = [];
+
+      const flushParagraph = () => {
+        if (!paragraph.length) return;
+        html.push(`<p>${inlineMarkdown(paragraph.join(' '))}</p>`);
+        paragraph = [];
+      };
+      const flushList = () => {
+        if (!ordered.length) return;
+        html.push(`<ol>${ordered.map(item => `<li>${inlineMarkdown(item)}</li>`).join('')}</ol>`);
+        ordered = [];
+      };
+
+      lines.forEach(rawLine => {
+        const hardBreak = /\s{2}$/.test(rawLine);
+        const line = rawLine.trim();
+        if (!line) { flushParagraph(); flushList(); return; }
+        const listItem = line.match(/^\d+\.\s+(.*)$/);
+        if (listItem) { flushParagraph(); ordered.push(listItem[1]); return; }
+        flushList();
+        if (/^#{3,4}\s+/.test(line)) {
+          flushParagraph();
+          html.push(`<h3>${inlineMarkdown(line.replace(/^#{3,4}\s+/, ''))}</h3>`);
+          return;
+        }
+        if (line.startsWith('> ')) {
+          flushParagraph();
+          html.push(`<blockquote>${inlineMarkdown(line.slice(2))}</blockquote>`);
+          return;
+        }
+        paragraph.push(line.replace(/\s{2}$/, ''));
+        if (hardBreak) flushParagraph();
+      });
+      flushParagraph();
+      flushList();
+      return html.join('');
+    }
+
+    function parseArticle(markdown) {
+      const prepared = markdown.replace(/^####\s+\*\*Works cited\*\*/m, '## **Works cited**');
+      const chunks = prepared.split(/^##\s+/m);
+      const intro = chunks.shift();
+      const titleMatch = intro.match(/^#\s+(.+)$/m);
+      const title = plainText(titleMatch ? titleMatch[1] : 'The Myth of the Pure Point Guard');
+      const introduction = intro.replace(/^#\s+.+$/m, '').trim();
+      const sections = chunks.map(chunk => {
+        const newline = chunk.indexOf('\n');
+        return {
+          title: plainText(newline < 0 ? chunk : chunk.slice(0, newline)),
+          body: newline < 0 ? '' : chunk.slice(newline + 1).trim()
+        };
+      });
+      return { title, introduction, sections };
+    }
+
+    function firstSentence(body) {
+      const line = body.split('\n').find(value => value.trim() && !/^\d+\./.test(value.trim())) || '';
+      const clean = plainText(line);
+      const match = clean.match(/^(.+?[.!?])(?:\s|$)/);
+      const sentence = match ? match[1] : clean;
+      return sentence.length > 235 ? `${sentence.slice(0, 232).trim()}...` : sentence;
+    }
+
+    function buildChapter(section, index, total) {
+      const id = `chapter-${index + 1}`;
+      const meta = chapterMeta[index] || ['ANALYTICAL CHAPTER', String(index + 1).padStart(2, '0'), firstSentence(section.body)];
+      const previous = index === 0 ? 'home' : `chapter-${index}`;
+      const next = index === total - 1 ? 'home' : `chapter-${index + 2}`;
+      const article = document.createElement('section');
+      article.className = 'view';
+      article.id = id;
+      article.dataset.title = section.title;
+      article.innerHTML = `
+        <article class="chapter" style="--chapter-accent:${index % 3 === 0 ? '#ef6b2e' : index % 3 === 1 ? '#67c8e8' : '#7ed7b6'}">
+          <header class="chapter-head">
+            <div class="chapter-index">${String(index + 1).padStart(2, '0')}</div>
+            <div><div class="chapter-era">${meta[0]}</div><h1>${escapeHtml(section.title)}</h1><p class="chapter-deck">${escapeHtml(firstSentence(section.body))}</p></div>
+          </header>
+          <div class="article-grid">
+            <aside class="side-fact"><strong>${escapeHtml(meta[1])}</strong><span>Key marker in the argument</span></aside>
+            <div class="article-copy">${renderBlocks(section.body)}</div>
+            <aside class="pull-quote">${escapeHtml(meta[2])}<small>Chapter ${String(index + 1).padStart(2, '0')}</small></aside>
+          </div>
+          <nav class="chapter-nav">
+            <button data-route="${previous}"><small>Previous</small>${index === 0 ? 'Opening thesis' : 'Prior chapter'}</button>
+            <button class="next" data-route="${next}"><small>${index === total - 1 ? 'Return' : 'Next chapter'}</small>${index === total - 1 ? 'Back to the opening' : 'Continue the argument'} →</button>
+          </nav>
+        </article>`;
+      return article;
+    }
 
     function setMenu(open) {
       panel.classList.toggle('open', open);
@@ -837,35 +979,73 @@
       if (!document.getElementById(id)) id = 'home';
       views.forEach(view => view.classList.toggle('active', view.id === id));
       const active = document.getElementById(id);
-      document.querySelectorAll('[data-route]').forEach(el => {
-        if (el.closest('.chapter-list')) el.setAttribute('aria-current', el.dataset.route === id ? 'page' : 'false');
+      document.querySelectorAll('.chapter-list [data-route]').forEach(el => {
+        el.setAttribute('aria-current', el.dataset.route === id ? 'page' : 'false');
       });
       const index = routes.findIndex(([route]) => route === id);
       progressBar.style.width = `${Math.max(0, index) / (routes.length - 1) * 100}%`;
-      eraLabel.textContent = active.dataset.title || 'An interactive basketball history';
+      eraLabel.textContent = active.dataset.title || 'An analytical basketball history';
       document.title = `${active.dataset.title || 'Court Vision'}: Court Vision`;
       if (updateHash && location.hash !== `#${id}`) history.pushState(null, '', `#${id}`);
       setMenu(false);
       window.scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
 
+    function buildNavigation(sections) {
+      routes = [['home', 'Opening thesis'], ...sections.map((section, index) => [`chapter-${index + 1}`, section.title])];
+      list.replaceChildren();
+      routes.forEach(([id, label], index) => {
+        const li = document.createElement('li');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.route = id;
+        button.textContent = label;
+        button.setAttribute('aria-label', `Chapter ${index + 1}: ${label}`);
+        li.appendChild(button);
+        list.appendChild(li);
+      });
+      document.querySelectorAll('[data-chapter]').forEach(card => {
+        const index = Number(card.dataset.chapter);
+        card.dataset.route = `chapter-${Math.min(index, sections.length)}`;
+      });
+      document.getElementById('startStory').dataset.route = 'chapter-1';
+      views = [...document.querySelectorAll('.view')];
+    }
+
+    async function initialize() {
+      try {
+        const response = await fetch(ARTICLE_PATH, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Article request failed with ${response.status}`);
+        const articleData = parseArticle(await response.text());
+        document.querySelectorAll('.view:not(#home)').forEach(view => view.remove());
+        articleData.sections.forEach((section, index) => {
+          document.getElementById('main').appendChild(buildChapter(section, index, articleData.sections.length));
+        });
+        buildNavigation(articleData.sections);
+        showRoute(location.hash.slice(1) || 'home', false);
+      } catch (error) {
+        console.error(error);
+        document.querySelector('.hero-lede').textContent = 'The revised article could not be loaded. Serve this folder through a web server so the Markdown file is available to the page.';
+      }
+    }
+
     document.addEventListener('click', event => {
       const route = event.target.closest('[data-route]');
-      if (route) { event.preventDefault(); showRoute(route.dataset.route); }
+      if (route && routes.length) { event.preventDefault(); showRoute(route.dataset.route); }
     });
     toggle.addEventListener('click', () => setMenu(!panel.classList.contains('open')));
     scrim.addEventListener('click', () => setMenu(false));
     document.getElementById('openTimeline').addEventListener('click', () => document.getElementById('timeline').scrollIntoView({ behavior: 'smooth' }));
-    window.addEventListener('popstate', () => showRoute(location.hash.slice(1) || 'home', false));
+    window.addEventListener('popstate', () => { if (routes.length) showRoute(location.hash.slice(1) || 'home', false); });
     window.addEventListener('keydown', event => {
       if (event.key === 'Escape') return setMenu(false);
-      if (panel.classList.contains('open') || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
+      if (!routes.length || panel.classList.contains('open') || /INPUT|TEXTAREA|SELECT/.test(event.target.tagName)) return;
       const current = routes.findIndex(([id]) => document.getElementById(id).classList.contains('active'));
       if (event.key === 'ArrowRight' && current < routes.length - 1) showRoute(routes[current + 1][0]);
       if (event.key === 'ArrowLeft' && current > 0) showRoute(routes[current - 1][0]);
     });
 
-    showRoute(location.hash.slice(1) || 'home', false);
+    initialize();
   </script>
 </body>
 </html>
