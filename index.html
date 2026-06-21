@@ -806,6 +806,7 @@
 
   <footer><span>COURT VISION · An independent basketball history experience</span><span>Original editorial artwork · Responsive by design</span></footer>
 
+  <script src="article-data.js"></script>
   <script>
     const ARTICLE_PATH = 'NBA_Point_Guard_Evolution_Analysis_revised.md';
     const list = document.getElementById('chapterList');
@@ -1014,9 +1015,17 @@
 
     async function initialize() {
       try {
-        const response = await fetch(ARTICLE_PATH, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`Article request failed with ${response.status}`);
-        const articleData = parseArticle(await response.text());
+        let markdown;
+        if (window.ARTICLE_BASE64) {
+          const binary = atob(window.ARTICLE_BASE64);
+          const bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+          markdown = new TextDecoder().decode(bytes);
+        } else {
+          const response = await fetch(ARTICLE_PATH, { cache: 'no-store' });
+          if (!response.ok) throw new Error(`Article request failed with ${response.status}`);
+          markdown = await response.text();
+        }
+        const articleData = parseArticle(markdown);
         document.querySelectorAll('.view:not(#home)').forEach(view => view.remove());
         articleData.sections.forEach((section, index) => {
           document.getElementById('main').appendChild(buildChapter(section, index, articleData.sections.length));
@@ -1025,7 +1034,7 @@
         showRoute(location.hash.slice(1) || 'home', false);
       } catch (error) {
         console.error(error);
-        document.querySelector('.hero-lede').textContent = 'The revised article could not be loaded. Serve this folder through a web server so the Markdown file is available to the page.';
+        document.querySelector('.hero-lede').textContent = 'The revised article could not be loaded. Confirm that article data is present beside this page.';
       }
     }
 
